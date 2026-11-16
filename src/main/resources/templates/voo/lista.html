@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Voos')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3">Voos</h1>
+        <a class="btn btn-primary" th:href="@{/voos/novo}">Novo voo</a>
+    </div>
+    <div class="alert alert-success" th:if="${mensagem}" th:text="${mensagem}"></div>
+    <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+    <table class="table table-striped align-middle">
+        <thead><tr><th>Código</th><th>Empresa</th><th>Situação</th><th>Valor (R$)</th><th class="text-end">Ações</th></tr></thead>
+        <tbody>
+        <tr th:each="voo : ${voos}">
+            <td th:text="${voo.codigoVoo}">GH101</td>
+            <td th:text="${voo.empresa.nome}">Companhia</td>
+            <td th:text="${voo.situacao}">PROGRAMADO</td>
+            <td th:text="${#numbers.formatDecimal(voo.valor,1,'POINT',2,'COMMA')}">550,00</td>
+            <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/voos/{id}(id=${voo.id})}">Detalhes / Escalas</a>
+                <form class="d-inline" method="post" th:action="@{/voos/{id}/excluir(id=${voo.id})}"
+                      onsubmit="return confirm('Excluir este voo? Não é permitido se houver bilhetes.');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(voos)}"><td colspan="5" class="text-muted text-center">Nenhum voo cadastrado.</td></tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

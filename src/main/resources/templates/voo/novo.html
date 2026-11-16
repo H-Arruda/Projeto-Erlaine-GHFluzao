@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Novo voo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container" style="max-width: 700px">
+    <h1 class="h3 mb-3">Novo voo</h1>
+    <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+    <div class="alert alert-info">O voo inicia como PROGRAMADO e com valor R$ 0,00. Adicione os trechos após criar.</div>
+    <form method="post" th:action="@{/voos}">
+        <div class="mb-3"><label class="form-label" for="empresa">Empresa</label>
+            <select required class="form-select" name="empresaId" id="empresa">
+                <option value="">Selecione...</option>
+                <option th:each="empresa : ${empresas}" th:value="${empresa.id}" th:text="${empresa.nome}"></option>
+            </select>
+        </div>
+        <div class="mb-3"><label class="form-label" for="codigo">Código do voo</label>
+            <input class="form-control" id="codigo" name="codigoVoo" maxlength="10" placeholder="GH404" required>
+        </div>
+        <button class="btn btn-primary" type="submit">Criar voo</button>
+        <a class="btn btn-link" th:href="@{/voos}">Cancelar</a>
+    </form>
+</main>
+</body>
+</html>
