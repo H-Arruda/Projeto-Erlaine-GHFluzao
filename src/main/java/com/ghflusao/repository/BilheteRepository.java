@@ -23,4 +23,9 @@ public interface BilheteRepository extends JpaRepository<Bilhete, Integer> {
            "and b.situacao <> com.ghflusao.model.SituacaoBilhete.CANCELADO")
     boolean existsAtivoParaPassageiroEVoo(@Param("passageiroId") Integer passageiroId,
                                           @Param("vooId") Integer vooId);
+
+     boolean existsByVooIdAndSituacaoIn(
+              Integer vooId,
+              java.util.Collection<com.ghflusao.model.SituacaoBilhete> situacoes
+       );
 }

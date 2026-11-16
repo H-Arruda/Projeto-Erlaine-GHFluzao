@@ -107,8 +107,16 @@ public class VooService {
             default -> false;
         };
         if (!permitida) throw new BusinessException("Transição de situação não permitida.");
-        if (nova == SituacaoVoo.CANCELADO && bilhetes.existsByVooId(vooId))
-            throw new BusinessException("Cancele os bilhetes antes de cancelar o voo.");
+        if (nova == SituacaoVoo.CANCELADO &&
+                bilhetes.existsByVooIdAndSituacaoIn(
+                    vooId,
+                    List.of(SituacaoBilhete.EMITIDO, SituacaoBilhete.UTILIZADO)
+                )) {
+            throw new BusinessException(
+                "Existem bilhetes ativos ou utilizados. " +
+                "Regularize-os antes de cancelar o voo."
+            );
+}
         voo.setSituacao(nova);
         voos.save(voo);
     }
