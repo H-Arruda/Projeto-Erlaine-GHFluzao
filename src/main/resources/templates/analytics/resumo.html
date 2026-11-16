@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Analytics')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container pb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Analytics</h1>
+    </div>
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item"><a class="nav-link active" th:href="@{/analytics}">Resumo gerencial</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/analytics/passageiros-por-voo}">Passageiros por voo</a></li>
+    </ul>
+
+    <!-- Indicadores principais -->
+    <p class="text-muted">Receita considera apenas bilhetes emitidos e utilizados. Bilhetes cancelados não entram.</p>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
+                <div class="text-muted small">Receita total</div>
+                <div class="fs-4 fw-semibold" th:text="${resumo.receitaFormatada()}">R$ 0,00</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
+                <div class="text-muted small">Bilhetes válidos</div>
+                <div class="fs-4 fw-semibold" th:text="${resumo.validos()}">0</div>
+                <div class="text-muted small" th:text="${resumo.registrados()} + ' registrados'">0 registrados</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
+                <div class="text-muted small">Bilhetes cancelados</div>
+                <div class="fs-4 fw-semibold" th:text="${resumo.cancelados()}">0</div>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
+                <div class="text-muted small">Ticket médio</div>
+                <div class="fs-4 fw-semibold" th:text="${resumo.ticketMedioFormatado()}">R$ 0,00</div>
+            </div></div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
+                <h2 class="h6">Receita por dia de emissão</h2>
+                <canvas id="graficoDia" height="200" th:if="${!#lists.isEmpty(dias)}"></canvas>
+                <p class="text-muted mb-0" th:if="${#lists.isEmpty(dias)}">Sem bilhetes válidos para exibir.</p>
+            </div></div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
+                <h2 class="h6">Voos mais procurados (bilhetes válidos)</h2>
+                <canvas id="graficoVoos" height="200" th:if="${!#lists.isEmpty(voos)}"></canvas>
+                <p class="text-muted mb-0" th:if="${#lists.isEmpty(voos)}">Sem bilhetes válidos para exibir.</p>
+            </div></div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
+                <h2 class="h6">Receita por empresa</h2>
+                <canvas id="graficoEmpresas" height="200" th:if="${!#lists.isEmpty(empresas)}"></canvas>
+                <p class="text-muted mb-0" th:if="${#lists.isEmpty(empresas)}">Sem bilhetes válidos para exibir.</p>
+            </div></div>
+        </div>
+    </div>
+
+    <!-- Tabelas -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <h2 class="h5">Voos mais procurados</h2>
+            <table class="table table-striped align-middle">
+                <thead><tr><th>#</th><th>Voo</th><th>Empresa</th><th class="text-end">Bilhetes</th><th class="text-end">Receita</th></tr></thead>
+                <tbody>
+                <tr th:each="v, it : ${voos}">
+                    <td th:text="${it.count}">1</td>
+                    <td th:text="${v.codigoVoo()}">GH101</td>
+                    <td th:text="${v.empresa()}">Empresa</td>
+                    <td class="text-end" th:text="${v.bilhetes()}">0</td>
+                    <td class="text-end" th:text="${v.receitaFormatada()}">R$ 0,00</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(voos)}"><td colspan="5" class="text-center text-muted">Nenhum bilhete válido registrado.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-6">
+            <h2 class="h5">Receita por empresa</h2>
+            <table class="table table-striped align-middle">
+                <thead><tr><th>Empresa</th><th class="text-end">Bilhetes</th><th class="text-end">Receita</th></tr></thead>
+                <tbody>
+                <tr th:each="e : ${empresas}">
+                    <td th:text="${e.empresa()}">Empresa</td>
+                    <td class="text-end" th:text="${e.bilhetes()}">0</td>
+                    <td class="text-end" th:text="${e.receitaFormatada()}">R$ 0,00</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(empresas)}"><td colspan="3" class="text-center text-muted">Nenhum bilhete válido registrado.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Consulta por período -->
+    <section id="periodo">
+        <h2 class="h5">Resultados do período</h2>
+        <p class="text-muted">Filtra pela data de emissão do bilhete e inclui o dia final inteiro. Afeta somente este bloco.</p>
+        <form class="row g-2 align-items-end mb-3" method="get" th:action="@{/analytics#periodo}">
+            <div class="col-auto">
+                <label class="form-label" for="dataInicio">Data inicial</label>
+                <input class="form-control" type="date" id="dataInicio" name="dataInicio" th:value="${dataInicio}" required>
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="dataFim">Data final</label>
+                <input class="form-control" type="date" id="dataFim" name="dataFim" th:value="${dataFim}" required>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Aplicar</button>
+                <a class="btn btn-link" th:href="@{/analytics#periodo}">Limpar</a>
+            </div>
+        </form>
+        <div class="alert alert-danger" th:if="${erroPeriodo}" th:text="${erroPeriodo}"></div>
+        <div class="row g-3" th:if="${periodo != null}">
+            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm"><div class="card-body">
+                <div class="text-muted small">Receita do período</div>
+                <div class="fs-5 fw-semibold" th:text="${periodo.receitaFormatada()}">R$ 0,00</div>
+            </div></div></div>
+            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm"><div class="card-body">
+                <div class="text-muted small">Bilhetes válidos</div>
+                <div class="fs-5 fw-semibold" th:text="${periodo.validos()}">0</div>
+            </div></div></div>
+            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm"><div class="card-body">
+                <div class="text-muted small">Cancelados</div>
+                <div class="fs-5 fw-semibold" th:text="${periodo.cancelados()}">0</div>
+            </div></div></div>
+            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm"><div class="card-body">
+                <div class="text-muted small">Ticket médio</div>
+                <div class="fs-5 fw-semibold" th:text="${periodo.ticketMedioFormatado()}">R$ 0,00</div>
+            </div></div></div>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    const dia = { rotulos: /*[[${diaRotulos}]]*/ [], valores: /*[[${diaValores}]]*/ [] };
+    const voos = { rotulos: /*[[${vooRotulos}]]*/ [], valores: /*[[${vooValores}]]*/ [] };
+    const empresas = { rotulos: /*[[${empresaRotulos}]]*/ [], valores: /*[[${empresaValores}]]*/ [] };
+
+    const brl = v => 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const cor = '#0d6efd';
+
+    function desenhar(id, tipo, dados, rotuloSerie, moeda, horizontal) {
+        const el = document.getElementById(id);
+        if (!el || typeof Chart === 'undefined') return;
+        new Chart(el, {
+            type: tipo,
+            data: { labels: dados.rotulos, datasets: [{ label: rotuloSerie, data: dados.valores,
+                    backgroundColor: cor + '99', borderColor: cor, borderWidth: 2, tension: 0.25, fill: tipo === 'line' }] },
+            options: {
+                indexAxis: horizontal ? 'y' : 'x',
+                plugins: { legend: { display: false },
+                    tooltip: { callbacks: { label: c => moeda ? brl(c.parsed[horizontal ? 'x' : 'y']) : c.parsed[horizontal ? 'x' : 'y'] + ' bilhete(s)' } } },
+                scales: { [horizontal ? 'x' : 'y']: { beginAtZero: true,
+                    ticks: moeda ? { callback: v => brl(v) } : { precision: 0 } } }
+            }
+        });
+    }
+    desenhar('graficoDia', 'line', dia, 'Receita', true, false);
+    desenhar('graficoVoos', 'bar', voos, 'Bilhetes', false, true);
+    desenhar('graficoEmpresas', 'bar', empresas, 'Receita', true, false);
+</script>
+</body>
+</html>
