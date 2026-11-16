@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Emitir bilhete')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container" style="max-width: 760px">
+    <h1 class="h3 mb-3">Emitir bilhete</h1>
+    <p class="text-muted">O valor é definido automaticamente a partir do preço do voo no momento da emissão.</p>
+    <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+    <form method="post" th:action="@{/bilhetes}">
+        <div class="mb-3">
+            <label for="vooId" class="form-label">Voo programado com trechos</label>
+            <select class="form-select" id="vooId" name="vooId" required>
+                <option value="">Selecione o voo</option>
+                <option th:each="v : ${voos}" th:value="${v.id}" th:text="|${v.codigoVoo} — ${v.empresa.nome} — R$ ${#numbers.formatDecimal(v.valor, 1, 'POINT', 2, 'COMMA')}|"></option>
+            </select>
+            <div class="form-text" th:if="${#lists.isEmpty(voos)}">Não há voos programados com trechos. Cadastre um voo primeiro.</div>
+        </div>
+        <div class="mb-3">
+            <label for="passageiroId" class="form-label">Passageiro</label>
+            <select class="form-select" id="passageiroId" name="passageiroId" required>
+                <option value="">Selecione o passageiro</option>
+                <option th:each="p : ${passageiros}" th:value="${p.id}" th:text="|${p.nome} — CPF ${p.cpf}|"></option>
+            </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Emitir bilhete</button>
+        <a class="btn btn-link" th:href="@{/bilhetes}">Cancelar</a>
+    </form>
+</main>
+</body>
+</html>

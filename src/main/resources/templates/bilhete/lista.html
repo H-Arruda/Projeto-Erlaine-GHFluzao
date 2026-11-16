@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Bilhetes')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3">Bilhetes</h1>
+        <a class="btn btn-primary" th:href="@{/bilhetes/novo}">Emitir bilhete</a>
+    </div>
+    <div class="alert alert-success" th:if="${mensagem}" th:text="${mensagem}"></div>
+    <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead><tr><th>ID</th><th>Voo</th><th>Passageiro</th><th>Data da emissão</th><th>Situação</th><th>Valor (R$)</th><th>Ação</th></tr></thead>
+            <tbody>
+            <tr th:each="b : ${bilhetes}">
+                <td th:text="${b.id}"></td>
+                <td th:text="${b.voo.codigoVoo}"></td>
+                <td th:text="${b.passageiro.nome}"></td>
+                <td th:text="${#temporals.format(b.dataEmissao, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${b.situacao}"></td>
+                <td th:text="${#numbers.formatDecimal(b.valorTotal, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td><a class="btn btn-sm btn-outline-primary" th:href="@{/bilhetes/{id}(id=${b.id})}">Detalhes</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(bilhetes)}"><td colspan="7" class="text-muted text-center">Nenhum bilhete cadastrado.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>
