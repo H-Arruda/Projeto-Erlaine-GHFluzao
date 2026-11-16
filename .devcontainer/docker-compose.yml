@@ -1,0 +1,21 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/base:bookworm
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    # compartilha a rede com o banco: dentro do app, o Postgres fica em localhost:5432
+    network_mode: service:db
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ghflusao
+      POSTGRES_USER: ghflusao
+      POSTGRES_PASSWORD: ghflusao
+
+volumes:
+  postgres-data:

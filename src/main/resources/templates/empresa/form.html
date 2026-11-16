@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Empresa')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container" style="max-width: 640px;">
+    <h1 class="h3 mb-3" th:text="${empresa.id == null} ? 'Nova empresa' : 'Editar empresa'">Empresa</h1>
+
+    <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+
+    <form th:action="@{/empresas}" th:object="${empresa}" method="post" novalidate>
+        <input type="hidden" th:field="*{id}">
+
+        <div class="mb-3">
+            <label class="form-label" for="nome">Nome</label>
+            <input class="form-control" id="nome" th:field="*{nome}"
+                   th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'">
+            <div class="invalid-feedback" th:errors="*{nome}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="cnpj">CNPJ (14 dígitos)</label>
+            <input class="form-control" id="cnpj" th:field="*{cnpj}" maxlength="14"
+                   th:classappend="${#fields.hasErrors('cnpj')} ? 'is-invalid'">
+            <div class="invalid-feedback" th:errors="*{cnpj}"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a class="btn btn-link" th:href="@{/empresas}">Cancelar</a>
+    </form>
+</main>
+</body>
+</html>
