@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cidade')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container" style="max-width:650px">
+  <h1 class="h3 mb-3" th:text="${id == null} ? 'Novo(a) cidade' : 'Editar cidade'">Cadastro</h1>
+  <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+  <form th:action="@{/cidades}" method="post">
+    <input type="hidden" name="id" th:value="${id}">
+    <div class="mb-3"><label class="form-label" for="nome">Nome</label>
+          <input class="form-control" id="nome" name="nome" maxlength="100" required th:value="${nome}">
+          </div>
+    <div class="mb-3"><label class="form-label" for="uf">UF (ex.: RJ)</label>
+          <input class="form-control" id="uf" name="uf" maxlength="2" required th:value="${uf}">
+          </div>
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a class="btn btn-link" th:href="@{/cidades}">Cancelar</a>
+  </form>
+</main>
+</body>
+</html>
