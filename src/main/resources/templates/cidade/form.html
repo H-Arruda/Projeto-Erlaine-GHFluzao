@@ -3,20 +3,28 @@
 <head th:replace="~{fragments/layout :: head('Cidade')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
-<main class="container" style="max-width:650px">
-  <h1 class="h3 mb-3" th:text="${id == null} ? 'Novo(a) cidade' : 'Editar cidade'">Cadastro</h1>
-  <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
-  <form th:action="@{/cidades}" method="post">
-    <input type="hidden" name="id" th:value="${id}">
-    <div class="mb-3"><label class="form-label" for="nome">Nome</label>
-          <input class="form-control" id="nome" name="nome" maxlength="100" required th:value="${nome}">
-          </div>
-    <div class="mb-3"><label class="form-label" for="uf">UF (ex.: RJ)</label>
-          <input class="form-control" id="uf" name="uf" maxlength="2" required th:value="${uf}">
-          </div>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a class="btn btn-link" th:href="@{/cidades}">Cancelar</a>
-  </form>
+<main>
+    <div class="gh-page-head">
+        <div>
+            <h1 class="gh-page-title" th:text="${id == null} ? 'Nova cidade' : 'Editar cidade'">Cadastro</h1>
+            <p class="gh-page-sub">Informe o nome e a UF da cidade.</p>
+        </div>
+    </div>
+
+    <div class="gh-narrow"><div th:replace="~{fragments/componentes :: alertas}"></div></div>
+
+    <div class="gh-card gh-form-card">
+        <form th:action="@{/cidades}" method="post">
+            <input type="hidden" name="id" th:value="${id}">
+            <div class="mb-3"><label class="form-label" for="nome">Nome</label>
+                <input class="form-control" id="nome" name="nome" maxlength="100" required th:value="${nome}">
+            </div>
+            <div class="mb-3"><label class="form-label" for="uf">UF (ex.: RJ)</label>
+                <input class="form-control" id="uf" name="uf" maxlength="2" required th:value="${uf}">
+            </div>
+            <div th:replace="~{fragments/componentes :: formAcoes(@{/cidades})}"></div>
+        </form>
+    </div>
 </main>
 </body>
 </html>

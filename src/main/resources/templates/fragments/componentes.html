@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--/*
+  Componentes visuais reutilizáveis do GH Viagens.
+  Nenhum deles conhece entidades: recebem apenas textos, números ou URLs.
+  Uso:  <div th:replace="~{fragments/componentes :: nomeDoComponente(args)}"></div>
+*/-->
+<body>
+
+<!--/* Cabeçalho de página com botão de ação opcional (acaoUrl = null para omitir). */-->
+<div th:fragment="cabecalho(titulo, subtitulo, acaoUrl, acaoRotulo)" class="gh-page-head">
+    <div>
+        <h1 class="gh-page-title" th:text="${titulo}">Título</h1>
+        <p class="gh-page-sub" th:if="${subtitulo}" th:text="${subtitulo}">Subtítulo</p>
+    </div>
+    <a class="btn btn-primary gh-btn-icon" th:if="${acaoUrl}" th:href="${acaoUrl}">
+        <svg class="gh-ico" aria-hidden="true"><use href="#i-plus"/></svg><span th:text="${acaoRotulo}">Novo</span>
+    </a>
+</div>
+
+<!--/* Mensagens de sucesso e erro. Lê os atributos "mensagem" e "erro" do modelo, quando existirem. */-->
+<div th:fragment="alertas">
+    <div class="alert alert-success gh-alert" role="status" th:if="${mensagem}">
+        <svg class="gh-ico" aria-hidden="true"><use href="#i-ok"/></svg><span th:text="${mensagem}">Operação concluída.</span>
+    </div>
+    <div class="alert alert-danger gh-alert" role="alert" th:if="${erro}">
+        <svg class="gh-ico" aria-hidden="true"><use href="#i-alert"/></svg><span th:text="${erro}">Não foi possível concluir.</span>
+    </div>
+</div>
+
+<!--/*
+  Selo de situação. Aceita qualquer texto/enum; as cores reconhecidas (PROGRAMADO, EM_ANDAMENTO,
+  CONCLUIDO, CANCELADO, EMITIDO, UTILIZADO) estão em gh.css. Valor desconhecido aparece em cinza.
+*/-->
+<span th:fragment="situacao(valor)" th:if="${valor != null}" class="gh-badge" th:attr="data-situacao=${valor}"
+      th:text="${valor.toString() == 'CONCLUIDO'} ? 'Concluído' : ${#strings.capitalize(#strings.toLowerCase(#strings.replace(valor.toString(), '_', ' ')))}">Situação</span>
+
+<!--/*
+  Ações de uma linha de tabela. Cada URL é opcional (null omite o botão).
+  confirmacao = texto exibido antes de excluir.
+*/-->
+<div th:fragment="acoes(editarUrl, excluirUrl, visualizarUrl, confirmacao)" class="gh-actions">
+    <a class="gh-icon-btn gh-icon-btn--view" th:if="${visualizarUrl}" th:href="${visualizarUrl}" title="Visualizar" aria-label="Visualizar">
+        <svg class="gh-ico" aria-hidden="true"><use href="#i-eye"/></svg><span>Ver</span>
+    </a>
+    <a class="gh-icon-btn gh-icon-btn--edit" th:if="${editarUrl}" th:href="${editarUrl}" title="Editar" aria-label="Editar">
+        <svg class="gh-ico" aria-hidden="true"><use href="#i-edit"/></svg><span>Editar</span>
+    </a>
+    <form class="d-inline" method="post" th:if="${excluirUrl}" th:action="${excluirUrl}" th:attr="data-confirm=${confirmacao}">
+        <button class="gh-icon-btn gh-icon-btn--danger" type="submit" title="Excluir" aria-label="Excluir">
+            <svg class="gh-ico" aria-hidden="true"><use href="#i-trash"/></svg><span>Excluir</span>
+        </button>
+    </form>
+</div>
+
+<!--/* Linha de tabela para "sem registros". Use dentro de <tbody>, em um <th:block th:if="..."> */-->
+<tr th:fragment="linhaVazia(colunas, mensagem)">
+    <td class="gh-empty" th:colspan="${colunas}">
+        <svg class="gh-ico" aria-hidden="true"><use href="#i-inbox"/></svg>
+        <span th:text="${mensagem}">Nenhum registro encontrado.</span>
+    </td>
+</tr>
+
+<!--/* Botões Salvar / Cancelar no rodapé de formulários. */-->
+<div th:fragment="formAcoes(cancelarUrl)" class="gh-form-actions">
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a class="btn btn-outline-secondary" th:href="${cancelarUrl}">Cancelar</a>
+</div>
+
+<!--/* Cartão de indicador. tom: 'grena' (padrão), 'verde' ou 'bege'. nota e tom podem ser null. */-->
+<div th:fragment="kpi(rotulo, valor, nota, icone, tom)" class="gh-kpi" th:classappend="${tom != null} ? ('gh-kpi--' + ${tom})">
+    <span class="gh-kpi-icon"><svg class="gh-ico" aria-hidden="true"><use th:href="'#' + ${icone}"/></svg></span>
+    <div>
+        <div class="gh-kpi-label" th:text="${rotulo}">Indicador</div>
+        <div class="gh-kpi-value" th:text="${valor}">0</div>
+        <div class="gh-kpi-note" th:if="${nota}" th:text="${nota}">nota</div>
+    </div>
+</div>
+
+</body>
+</html>

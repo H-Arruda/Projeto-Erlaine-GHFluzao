@@ -3,66 +3,66 @@
 <head th:replace="~{fragments/layout :: head('Passageiros por voo')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
-<main class="container pb-5">
+<main>
+    <div th:replace="~{fragments/componentes :: cabecalho('Passageiros por voo', 'Consulte quem possui bilhete em cada voo.', null, null)}"></div>
 
-    <h1 class="h3 mb-3">Analytics</h1>
-    <ul class="nav nav-pills mb-4">
-        <li class="nav-item"><a class="nav-link" th:href="@{/analytics}">Resumo gerencial</a></li>
-        <li class="nav-item"><a class="nav-link active" th:href="@{/analytics/passageiros-por-voo}">Passageiros por voo</a></li>
-    </ul>
+    <div class="gh-card mb-4">
+        <form class="gh-filter" method="get" th:action="@{/analytics/passageiros-por-voo}">
+            <div class="flex-grow-1" style="max-width: 460px;">
+                <label class="form-label" for="vooId">Voo</label>
+                <select class="form-select" id="vooId" name="vooId" required>
+                    <option value="">Selecione um voo</option>
+                    <option th:each="v : ${voos}" th:value="${v.id()}" th:text="${v.rotulo()}"
+                            th:selected="${vooId != null and v.id() == vooId}">GH101 · Empresa</option>
+                </select>
+            </div>
+            <div>
+                <button class="btn btn-primary" type="submit">Consultar</button>
+            </div>
+        </form>
+    </div>
 
-    <h2 class="h5">Passageiros por voo</h2>
-    <form class="row g-2 align-items-end mb-4" method="get" th:action="@{/analytics/passageiros-por-voo}">
-        <div class="col-md-6 col-lg-5">
-            <label class="form-label" for="vooId">Voo</label>
-            <select class="form-select" id="vooId" name="vooId" required>
-                <option value="">Selecione um voo</option>
-                <option th:each="v : ${voos}" th:value="${v.id()}" th:text="${v.rotulo()}"
-                        th:selected="${vooId != null and v.id() == vooId}">GH101 · Empresa</option>
-            </select>
-        </div>
-        <div class="col-auto">
-            <button class="btn btn-primary" type="submit">Consultar</button>
-        </div>
-    </form>
-
-    <div class="alert alert-info" th:if="${#lists.isEmpty(voos)}">Nenhum voo cadastrado.</div>
-    <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+    <div class="alert alert-info gh-alert" th:if="${#lists.isEmpty(voos)}">
+        <svg class="gh-ico" aria-hidden="true"><use href="#i-inbox"/></svg><span>Nenhum voo cadastrado.</span>
+    </div>
+    <div class="alert alert-danger gh-alert" role="alert" th:if="${erro}">
+        <svg class="gh-ico" aria-hidden="true"><use href="#i-alert"/></svg><span th:text="${erro}"></span>
+    </div>
 
     <div th:if="${relatorio != null}">
-        <div class="card border-0 shadow-sm mb-3"><div class="card-body">
-            <div class="d-flex flex-wrap justify-content-between gap-2">
+        <div class="gh-card mb-3">
+            <div class="gh-report-head">
                 <div>
-                    <div class="fs-5 fw-semibold" th:text="${relatorio.voo().codigoVoo()} + ' · ' + ${relatorio.voo().empresa()}">GH101</div>
-                    <div class="text-muted" th:if="${relatorio.rota() != ''}" th:text="'Rota: ' + ${relatorio.rota()}">Rota</div>
+                    <h2 class="gh-report-title" th:text="${relatorio.voo().codigoVoo()} + ' · ' + ${relatorio.voo().empresa()}">GH101</h2>
+                    <div class="gh-route" th:if="${relatorio.rota() != ''}" th:text="'Rota: ' + ${relatorio.rota()}">Rota</div>
                 </div>
                 <div class="text-md-end">
-                    <div>Situação do voo: <span class="badge text-bg-secondary" th:text="${relatorio.voo().situacao()}">PROGRAMADO</span></div>
-                    <div class="text-muted small" th:text="'Valor do voo: ' + ${relatorio.voo().valorFormatado()}">R$ 0,00</div>
+                    <div>Situação do voo: <span th:replace="~{fragments/componentes :: situacao(${relatorio.voo().situacao()})}"></span></div>
+                    <div class="text-muted small mt-1" th:text="'Valor do voo: ' + ${relatorio.voo().valorFormatado()}">R$ 0,00</div>
                 </div>
             </div>
             <hr>
-            <span class="me-3"><strong th:text="${relatorio.validos()}">0</strong> bilhete(s) válido(s)</span>
+            <span class="me-4"><strong th:text="${relatorio.validos()}">0</strong> bilhete(s) válido(s)</span>
             <span><strong th:text="${relatorio.cancelados()}">0</strong> cancelado(s)</span>
-        </div></div>
+        </div>
 
-        <table class="table table-striped align-middle">
-            <thead><tr><th>Passageiro</th><th>CPF</th><th>Emissão</th><th class="text-end">Valor</th><th>Situação</th></tr></thead>
-            <tbody>
-            <tr th:each="p : ${relatorio.passageiros()}" th:classappend="${p.cancelado()} ? 'text-muted'">
-                <td th:text="${p.nome()}">Nome</td>
-                <td th:text="${p.cpfFormatado()}">000.000.000-00</td>
-                <td th:text="${p.dataFormatada()}">01/01/2026 10:00</td>
-                <td class="text-end" th:text="${p.valorFormatado()}">R$ 0,00</td>
-                <td><span class="badge"
-                          th:classappend="${p.cancelado()} ? 'text-bg-secondary' : (${p.situacao().name() == 'UTILIZADO'} ? 'text-bg-success' : 'text-bg-primary')"
-                          th:text="${p.situacao()}">EMITIDO</span></td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(relatorio.passageiros())}">
-                <td colspan="5" class="text-center text-muted">Nenhum bilhete emitido para este voo.</td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="gh-card gh-table-card"><div class="gh-table-wrap">
+            <table class="table table-striped table-hover align-middle">
+                <thead><tr><th>Passageiro</th><th>CPF</th><th>Emissão</th><th class="text-end">Valor</th><th>Situação</th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${relatorio.passageiros()}" th:classappend="${p.cancelado()} ? 'text-muted'">
+                    <td class="fw-semibold" th:text="${p.nome()}">Nome</td>
+                    <td th:text="${p.cpfFormatado()}">000.000.000-00</td>
+                    <td th:text="${p.dataFormatada()}">01/01/2026 10:00</td>
+                    <td class="text-end" th:text="${p.valorFormatado()}">R$ 0,00</td>
+                    <td><span th:replace="~{fragments/componentes :: situacao(${p.situacao()})}"></span></td>
+                </tr>
+                <th:block th:if="${#lists.isEmpty(relatorio.passageiros())}">
+                    <tr th:replace="~{fragments/componentes :: linhaVazia(5, 'Nenhum bilhete emitido para este voo.')}"></tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div></div>
     </div>
 </main>
 </body>

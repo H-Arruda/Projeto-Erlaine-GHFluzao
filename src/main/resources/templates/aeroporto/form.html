@@ -3,25 +3,34 @@
 <head th:replace="~{fragments/layout :: head('Aeroporto')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
-<main class="container" style="max-width:650px">
-  <h1 class="h3 mb-3" th:text="${id == null} ? 'Novo(a) aeroporto' : 'Editar aeroporto'">Cadastro</h1>
-  <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
-  <form th:action="@{/aeroportos}" method="post">
-    <input type="hidden" name="id" th:value="${id}">
-    <div class="mb-3"><label class="form-label" for="nome">Nome</label>
-          <input class="form-control" id="nome" name="nome" maxlength="100" required th:value="${nome}">
-          </div>
-    <div class="mb-3"><label class="form-label" for="sigla">Sigla IATA (ex.: GIG)</label>
-          <input class="form-control" id="sigla" name="sigla" maxlength="3" required th:value="${sigla}">
-          </div>
-    <div class="mb-3"><label class="form-label" for="cidadeId">Cidade</label>
-          <select class="form-select" name="cidadeId" id="cidadeId" required>
-          <option value="">Selecione uma cidade</option>
-          <option th:each="c : ${cidades}" th:value="${c.id}" th:text="${c.nome + ' - ' + c.uf}" th:selected="${c.id == cidadeId}"></option>
-          </select></div>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a class="btn btn-link" th:href="@{/aeroportos}">Cancelar</a>
-  </form>
+<main>
+    <div class="gh-page-head">
+        <div>
+            <h1 class="gh-page-title" th:text="${id == null} ? 'Novo aeroporto' : 'Editar aeroporto'">Cadastro</h1>
+            <p class="gh-page-sub">Informe o nome, a sigla IATA e a cidade do aeroporto.</p>
+        </div>
+    </div>
+
+    <div class="gh-narrow"><div th:replace="~{fragments/componentes :: alertas}"></div></div>
+
+    <div class="gh-card gh-form-card">
+        <form th:action="@{/aeroportos}" method="post">
+            <input type="hidden" name="id" th:value="${id}">
+            <div class="mb-3"><label class="form-label" for="nome">Nome</label>
+                <input class="form-control" id="nome" name="nome" maxlength="100" required th:value="${nome}">
+            </div>
+            <div class="mb-3"><label class="form-label" for="sigla">Sigla IATA (ex.: GIG)</label>
+                <input class="form-control" id="sigla" name="sigla" maxlength="3" required th:value="${sigla}">
+            </div>
+            <div class="mb-3"><label class="form-label" for="cidadeId">Cidade</label>
+                <select class="form-select" name="cidadeId" id="cidadeId" required>
+                    <option value="">Selecione uma cidade</option>
+                    <option th:each="c : ${cidades}" th:value="${c.id}" th:text="${c.nome + ' - ' + c.uf}" th:selected="${c.id == cidadeId}"></option>
+                </select>
+            </div>
+            <div th:replace="~{fragments/componentes :: formAcoes(@{/aeroportos})}"></div>
+        </form>
+    </div>
 </main>
 </body>
 </html>

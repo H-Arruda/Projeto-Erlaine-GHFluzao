@@ -1,143 +1,138 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Analytics')}"></head>
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
-<main class="container pb-5">
+<main>
+    <div th:replace="~{fragments/componentes :: cabecalho('Dashboard', 'Visão geral da operação e das vendas de bilhetes.', null, null)}"></div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Analytics</h1>
+    <div class="gh-banner">
+        <h2>Painel de operações</h2>
+        <p>A receita considera apenas bilhetes emitidos e utilizados. Bilhetes cancelados não entram.</p>
     </div>
-    <ul class="nav nav-pills mb-4">
-        <li class="nav-item"><a class="nav-link active" th:href="@{/analytics}">Resumo gerencial</a></li>
-        <li class="nav-item"><a class="nav-link" th:href="@{/analytics/passageiros-por-voo}">Passageiros por voo</a></li>
-    </ul>
 
     <!-- Indicadores principais -->
-    <p class="text-muted">Receita considera apenas bilhetes emitidos e utilizados. Bilhetes cancelados não entram.</p>
     <div class="row g-3 mb-4">
-        <div class="col-6 col-lg-3">
-            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
-                <div class="text-muted small">Receita total</div>
-                <div class="fs-4 fw-semibold" th:text="${resumo.receitaFormatada()}">R$ 0,00</div>
-            </div></div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div th:replace="~{fragments/componentes :: kpi('Receita total', ${resumo.receitaFormatada()}, 'Emitidos e utilizados', 'i-wallet', 'grena')}"></div>
         </div>
-        <div class="col-6 col-lg-3">
-            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
-                <div class="text-muted small">Bilhetes válidos</div>
-                <div class="fs-4 fw-semibold" th:text="${resumo.validos()}">0</div>
-                <div class="text-muted small" th:text="${resumo.registrados()} + ' registrados'">0 registrados</div>
-            </div></div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div th:replace="~{fragments/componentes :: kpi('Bilhetes válidos', ${resumo.validos()}, ${resumo.registrados() + ' registrados no total'}, 'i-ticket', 'verde')}"></div>
         </div>
-        <div class="col-6 col-lg-3">
-            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
-                <div class="text-muted small">Bilhetes cancelados</div>
-                <div class="fs-4 fw-semibold" th:text="${resumo.cancelados()}">0</div>
-            </div></div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div th:replace="~{fragments/componentes :: kpi('Bilhetes cancelados', ${resumo.cancelados()}, 'Não geram receita', 'i-xcircle', 'bege')}"></div>
         </div>
-        <div class="col-6 col-lg-3">
-            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
-                <div class="text-muted small">Ticket médio</div>
-                <div class="fs-4 fw-semibold" th:text="${resumo.ticketMedioFormatado()}">R$ 0,00</div>
-            </div></div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div th:replace="~{fragments/componentes :: kpi('Ticket médio', ${resumo.ticketMedioFormatado()}, 'Receita por bilhete válido', 'i-receipt', 'grena')}"></div>
         </div>
     </div>
 
     <!-- Gráficos -->
     <div class="row g-3 mb-4">
         <div class="col-lg-6">
-            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
-                <h2 class="h6">Receita por dia de emissão</h2>
+            <div class="gh-card h-100">
+                <h2 class="gh-card-title">Receita por dia de emissão</h2>
                 <canvas id="graficoDia" height="200" th:if="${!#lists.isEmpty(dias)}"></canvas>
                 <p class="text-muted mb-0" th:if="${#lists.isEmpty(dias)}">Sem bilhetes válidos para exibir.</p>
-            </div></div>
+            </div>
         </div>
         <div class="col-lg-6">
-            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
-                <h2 class="h6">Voos mais procurados (bilhetes válidos)</h2>
+            <div class="gh-card h-100">
+                <h2 class="gh-card-title">Voos mais procurados (bilhetes válidos)</h2>
                 <canvas id="graficoVoos" height="200" th:if="${!#lists.isEmpty(voos)}"></canvas>
                 <p class="text-muted mb-0" th:if="${#lists.isEmpty(voos)}">Sem bilhetes válidos para exibir.</p>
-            </div></div>
+            </div>
         </div>
         <div class="col-lg-6">
-            <div class="card h-100 border-0 shadow-sm"><div class="card-body">
-                <h2 class="h6">Receita por empresa</h2>
+            <div class="gh-card h-100">
+                <h2 class="gh-card-title">Receita por empresa</h2>
                 <canvas id="graficoEmpresas" height="200" th:if="${!#lists.isEmpty(empresas)}"></canvas>
                 <p class="text-muted mb-0" th:if="${#lists.isEmpty(empresas)}">Sem bilhetes válidos para exibir.</p>
-            </div></div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="gh-card h-100">
+                <h2 class="gh-card-title">Acesso rápido</h2>
+                <div class="row g-2">
+                    <div class="col-6"><a class="gh-shortcut" th:href="@{/empresas}"><svg class="gh-ico" aria-hidden="true"><use href="#i-building"/></svg><span>Empresas<small>Companhias</small></span></a></div>
+                    <div class="col-6"><a class="gh-shortcut" th:href="@{/cidades}"><svg class="gh-ico" aria-hidden="true"><use href="#i-pin"/></svg><span>Cidades<small>Localidades</small></span></a></div>
+                    <div class="col-6"><a class="gh-shortcut" th:href="@{/aeroportos}"><svg class="gh-ico" aria-hidden="true"><use href="#i-plane"/></svg><span>Aeroportos<small>Siglas IATA</small></span></a></div>
+                    <div class="col-6"><a class="gh-shortcut" th:href="@{/passageiros}"><svg class="gh-ico" aria-hidden="true"><use href="#i-users"/></svg><span>Passageiros<small>Cadastro</small></span></a></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Tabelas -->
     <div class="row g-3 mb-4">
         <div class="col-lg-6">
-            <h2 class="h5">Voos mais procurados</h2>
-            <table class="table table-striped align-middle">
-                <thead><tr><th>#</th><th>Voo</th><th>Empresa</th><th class="text-end">Bilhetes</th><th class="text-end">Receita</th></tr></thead>
-                <tbody>
-                <tr th:each="v, it : ${voos}">
-                    <td th:text="${it.count}">1</td>
-                    <td th:text="${v.codigoVoo()}">GH101</td>
-                    <td th:text="${v.empresa()}">Empresa</td>
-                    <td class="text-end" th:text="${v.bilhetes()}">0</td>
-                    <td class="text-end" th:text="${v.receitaFormatada()}">R$ 0,00</td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(voos)}"><td colspan="5" class="text-center text-muted">Nenhum bilhete válido registrado.</td></tr>
-                </tbody>
-            </table>
+            <h2 class="gh-card-title">Voos mais procurados</h2>
+            <div class="gh-card gh-table-card"><div class="gh-table-wrap">
+                <table class="table table-striped table-hover align-middle">
+                    <thead><tr><th>#</th><th>Voo</th><th>Empresa</th><th class="text-end">Bilhetes</th><th class="text-end">Receita</th></tr></thead>
+                    <tbody>
+                    <tr th:each="v, it : ${voos}">
+                        <td class="gh-id" th:text="${it.count}">1</td>
+                        <td><span class="gh-code" th:text="${v.codigoVoo()}">GH101</span></td>
+                        <td th:text="${v.empresa()}">Empresa</td>
+                        <td class="text-end" th:text="${v.bilhetes()}">0</td>
+                        <td class="text-end" th:text="${v.receitaFormatada()}">R$ 0,00</td>
+                    </tr>
+                    <th:block th:if="${#lists.isEmpty(voos)}">
+                        <tr th:replace="~{fragments/componentes :: linhaVazia(5, 'Nenhum bilhete válido registrado.')}"></tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div></div>
         </div>
         <div class="col-lg-6">
-            <h2 class="h5">Receita por empresa</h2>
-            <table class="table table-striped align-middle">
-                <thead><tr><th>Empresa</th><th class="text-end">Bilhetes</th><th class="text-end">Receita</th></tr></thead>
-                <tbody>
-                <tr th:each="e : ${empresas}">
-                    <td th:text="${e.empresa()}">Empresa</td>
-                    <td class="text-end" th:text="${e.bilhetes()}">0</td>
-                    <td class="text-end" th:text="${e.receitaFormatada()}">R$ 0,00</td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(empresas)}"><td colspan="3" class="text-center text-muted">Nenhum bilhete válido registrado.</td></tr>
-                </tbody>
-            </table>
+            <h2 class="gh-card-title">Receita por empresa</h2>
+            <div class="gh-card gh-table-card"><div class="gh-table-wrap">
+                <table class="table table-striped table-hover align-middle">
+                    <thead><tr><th>Empresa</th><th class="text-end">Bilhetes</th><th class="text-end">Receita</th></tr></thead>
+                    <tbody>
+                    <tr th:each="e : ${empresas}">
+                        <td class="fw-semibold" th:text="${e.empresa()}">Empresa</td>
+                        <td class="text-end" th:text="${e.bilhetes()}">0</td>
+                        <td class="text-end" th:text="${e.receitaFormatada()}">R$ 0,00</td>
+                    </tr>
+                    <th:block th:if="${#lists.isEmpty(empresas)}">
+                        <tr th:replace="~{fragments/componentes :: linhaVazia(3, 'Nenhum bilhete válido registrado.')}"></tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div></div>
         </div>
     </div>
 
     <!-- Consulta por período -->
     <section id="periodo">
-        <h2 class="h5">Resultados do período</h2>
-        <p class="text-muted">Filtra pela data de emissão do bilhete e inclui o dia final inteiro. Afeta somente este bloco.</p>
-        <form class="row g-2 align-items-end mb-3" method="get" th:action="@{/analytics#periodo}">
-            <div class="col-auto">
-                <label class="form-label" for="dataInicio">Data inicial</label>
-                <input class="form-control" type="date" id="dataInicio" name="dataInicio" th:value="${dataInicio}" required>
-            </div>
-            <div class="col-auto">
-                <label class="form-label" for="dataFim">Data final</label>
-                <input class="form-control" type="date" id="dataFim" name="dataFim" th:value="${dataFim}" required>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Aplicar</button>
-                <a class="btn btn-link" th:href="@{/analytics#periodo}">Limpar</a>
-            </div>
-        </form>
-        <div class="alert alert-danger" th:if="${erroPeriodo}" th:text="${erroPeriodo}"></div>
+        <h2 class="gh-card-title">Resultados do período</h2>
+        <div class="gh-card mb-3">
+            <p class="text-muted">Filtra pela data de emissão do bilhete e inclui o dia final inteiro. Afeta somente este bloco.</p>
+            <form class="gh-filter" method="get" th:action="@{/analytics#periodo}">
+                <div>
+                    <label class="form-label" for="dataInicio">Data inicial</label>
+                    <input class="form-control" type="date" id="dataInicio" name="dataInicio" th:value="${dataInicio}" required>
+                </div>
+                <div>
+                    <label class="form-label" for="dataFim">Data final</label>
+                    <input class="form-control" type="date" id="dataFim" name="dataFim" th:value="${dataFim}" required>
+                </div>
+                <div>
+                    <button class="btn btn-primary" type="submit">Aplicar</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/analytics#periodo}">Limpar</a>
+                </div>
+            </form>
+        </div>
+        <div class="alert alert-danger gh-alert" role="alert" th:if="${erroPeriodo}">
+            <svg class="gh-ico" aria-hidden="true"><use href="#i-alert"/></svg><span th:text="${erroPeriodo}"></span>
+        </div>
         <div class="row g-3" th:if="${periodo != null}">
-            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm"><div class="card-body">
-                <div class="text-muted small">Receita do período</div>
-                <div class="fs-5 fw-semibold" th:text="${periodo.receitaFormatada()}">R$ 0,00</div>
-            </div></div></div>
-            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm"><div class="card-body">
-                <div class="text-muted small">Bilhetes válidos</div>
-                <div class="fs-5 fw-semibold" th:text="${periodo.validos()}">0</div>
-            </div></div></div>
-            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm"><div class="card-body">
-                <div class="text-muted small">Cancelados</div>
-                <div class="fs-5 fw-semibold" th:text="${periodo.cancelados()}">0</div>
-            </div></div></div>
-            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm"><div class="card-body">
-                <div class="text-muted small">Ticket médio</div>
-                <div class="fs-5 fw-semibold" th:text="${periodo.ticketMedioFormatado()}">R$ 0,00</div>
-            </div></div></div>
+            <div class="col-12 col-sm-6 col-xl-3"><div th:replace="~{fragments/componentes :: kpi('Receita do período', ${periodo.receitaFormatada()}, null, 'i-wallet', 'grena')}"></div></div>
+            <div class="col-12 col-sm-6 col-xl-3"><div th:replace="~{fragments/componentes :: kpi('Bilhetes válidos', ${periodo.validos()}, null, 'i-ticket', 'verde')}"></div></div>
+            <div class="col-12 col-sm-6 col-xl-3"><div th:replace="~{fragments/componentes :: kpi('Cancelados', ${periodo.cancelados()}, null, 'i-xcircle', 'bege')}"></div></div>
+            <div class="col-12 col-sm-6 col-xl-3"><div th:replace="~{fragments/componentes :: kpi('Ticket médio', ${periodo.ticketMedioFormatado()}, null, 'i-receipt', 'grena')}"></div></div>
         </div>
     </section>
 </main>
@@ -148,28 +143,39 @@
     const voos = { rotulos: /*[[${vooRotulos}]]*/ [], valores: /*[[${vooValores}]]*/ [] };
     const empresas = { rotulos: /*[[${empresaRotulos}]]*/ [], valores: /*[[${empresaValores}]]*/ [] };
 
+    const GRENA = '#762334', VERDE = '#176B4D', BEGE = '#E8D8C1';
     const brl = v => 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const cor = '#0d6efd';
 
-    function desenhar(id, tipo, dados, rotuloSerie, moeda, horizontal) {
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+        Chart.defaults.color = '#756a6d';
+    }
+
+    function desenhar(id, tipo, dados, rotuloSerie, moeda, horizontal, cor) {
         const el = document.getElementById(id);
         if (!el || typeof Chart === 'undefined') return;
+        const eixo = horizontal ? 'x' : 'y';
         new Chart(el, {
             type: tipo,
             data: { labels: dados.rotulos, datasets: [{ label: rotuloSerie, data: dados.valores,
-                    backgroundColor: cor + '99', borderColor: cor, borderWidth: 2, tension: 0.25, fill: tipo === 'line' }] },
+                    backgroundColor: tipo === 'line' ? cor + '22' : cor, borderColor: cor, borderWidth: tipo === 'line' ? 3 : 0,
+                    borderRadius: tipo === 'bar' ? 6 : 0, pointBackgroundColor: BEGE, pointBorderColor: cor, pointRadius: 4,
+                    tension: 0.3, fill: tipo === 'line', maxBarThickness: 46 }] },
             options: {
                 indexAxis: horizontal ? 'y' : 'x',
                 plugins: { legend: { display: false },
-                    tooltip: { callbacks: { label: c => moeda ? brl(c.parsed[horizontal ? 'x' : 'y']) : c.parsed[horizontal ? 'x' : 'y'] + ' bilhete(s)' } } },
-                scales: { [horizontal ? 'x' : 'y']: { beginAtZero: true,
-                    ticks: moeda ? { callback: v => brl(v) } : { precision: 0 } } }
+                    tooltip: { callbacks: { label: c => moeda ? brl(c.parsed[eixo]) : c.parsed[eixo] + ' bilhete(s)' } } },
+                scales: {
+                    [eixo]: { beginAtZero: true, grid: { color: '#efe6d8' },
+                        ticks: moeda ? { callback: v => brl(v) } : { precision: 0 } },
+                    [horizontal ? 'y' : 'x']: { grid: { display: false } }
+                }
             }
         });
     }
-    desenhar('graficoDia', 'line', dia, 'Receita', true, false);
-    desenhar('graficoVoos', 'bar', voos, 'Bilhetes', false, true);
-    desenhar('graficoEmpresas', 'bar', empresas, 'Receita', true, false);
+    desenhar('graficoDia', 'line', dia, 'Receita', true, false, GRENA);
+    desenhar('graficoVoos', 'bar', voos, 'Bilhetes', false, true, VERDE);
+    desenhar('graficoEmpresas', 'bar', empresas, 'Receita', true, false, GRENA);
 </script>
 </body>
 </html>

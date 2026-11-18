@@ -1,22 +1,91 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<!--/*
+  Layout compartilhado do GH Viagens.
+  Contrato mantido: head(titulo) e navbar. Toda página que usa
+      <head th:replace="~{fragments/layout :: head('Titulo')}"></head>
+      <nav  th:replace="~{fragments/layout :: navbar}"></nav>
+  e coloca o conteúdo em <main> recebe automaticamente menu lateral, barra superior e estilo.
+*/-->
 <head th:fragment="head(titulo)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${titulo} + ' · GHFlusão'">GHFlusão</title>
+    <title th:text="${titulo} + ' · GH Viagens'">GH Viagens</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23762334'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23E8D8C1'/%3E%3C/svg%3E">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/gh.css}">
+    <script th:src="@{/js/gh.js}" defer></script>
 </head>
 <body>
-<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/}">Erlaine GHFlusão</a>
-        <ul class="navbar-nav me-auto">
-            <li class="nav-item"><a class="nav-link" th:href="@{/empresas}">Empresas</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/cidades}">Cidades</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/aeroportos}">Aeroportos</a></li>
-            <li class="nav-item"><a class="nav-link" th:href="@{/passageiros}">Passageiros</a></li>
-        </ul>
-    </div>
-</nav>
+<div th:fragment="navbar">
+    <!-- Ícones (sprite SVG reutilizado por todos os componentes) -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false">
+        <defs>
+            <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol>
+            <symbol id="i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></symbol>
+            <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+            <symbol id="i-plane" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol>
+            <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+            <symbol id="i-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></symbol>
+            <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></symbol>
+            <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></symbol>
+            <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+            <symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+            <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+            <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></symbol>
+            <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+            <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+            <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></symbol>
+            <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+            <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+            <symbol id="i-xcircle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol>
+            <symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+            <symbol id="i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></symbol>
+        </defs>
+    </svg>
+
+    <aside class="gh-sidebar" id="ghSidebar" aria-label="Menu principal">
+        <a class="gh-brand" th:href="@{/analytics}">
+            <span class="gh-brand-mark"><svg class="gh-ico" aria-hidden="true"><use href="#i-plane"/></svg></span>
+            <span>
+                <span class="gh-brand-name d-block">GH Viagens</span>
+                <span class="gh-brand-tag d-block">Gestão aérea</span>
+            </span>
+        </a>
+
+        <nav class="gh-nav" aria-label="Navegação">
+            <div class="gh-nav-section">Visão geral</div>
+            <a th:href="@{/analytics}"><svg class="gh-ico" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></a>
+
+            <div class="gh-nav-section">Cadastros</div>
+            <a th:href="@{/empresas}"><svg class="gh-ico" aria-hidden="true"><use href="#i-building"/></svg><span>Empresas</span></a>
+            <a th:href="@{/cidades}"><svg class="gh-ico" aria-hidden="true"><use href="#i-pin"/></svg><span>Cidades</span></a>
+            <a th:href="@{/aeroportos}"><svg class="gh-ico" aria-hidden="true"><use href="#i-plane"/></svg><span>Aeroportos</span></a>
+            <a th:href="@{/passageiros}"><svg class="gh-ico" aria-hidden="true"><use href="#i-users"/></svg><span>Passageiros</span></a>
+
+            <div class="gh-nav-section">Operação</div>
+            <a th:href="@{/voos}"><svg class="gh-ico" aria-hidden="true"><use href="#i-route"/></svg><span>Voos e Escalas</span></a>
+            <a th:href="@{/bilhetes}"><svg class="gh-ico" aria-hidden="true"><use href="#i-ticket"/></svg><span>Bilhetes</span></a>
+
+            <div class="gh-nav-section">Relatórios</div>
+            <a th:href="@{/analytics/passageiros-por-voo}"><svg class="gh-ico" aria-hidden="true"><use href="#i-chart"/></svg><span>Passageiros por voo</span></a>
+        </nav>
+
+        <div class="gh-sidebar-foot">GH Viagens · Painel administrativo</div>
+    </aside>
+
+    <div class="gh-backdrop" id="ghBackdrop"></div>
+
+    <header class="gh-topbar">
+        <button class="gh-menu-toggle" id="ghMenuToggle" type="button" aria-label="Abrir menu" aria-controls="ghSidebar" aria-expanded="false">
+            <svg class="gh-ico" aria-hidden="true"><use href="#i-menu"/></svg>
+        </button>
+        <div>
+            <span class="gh-topbar-title">GH Viagens</span>
+            <span class="gh-topbar-sub">· Gestão de voos e operações aéreas</span>
+        </div>
+        <span class="gh-topbar-chip">Painel administrativo</span>
+    </header>
+</div>
 </body>
 </html>
